@@ -5,8 +5,8 @@ import styles from './contact-list.module.scss'
 
 const ContactList = ({contacts, deleteContact}) => {
 
-    const elements = contacts.map(({ id, name, number }) => (
-            <li key={id}>{name}: {number}
+    const elements = contacts.map(({ id, name, phone }) => (
+            <li key={id}>{name}: {phone}
                 <button className={styles.btn} onClick={() => deleteContact(id)}>Delete</button>
             </li>
         ));
@@ -22,7 +22,7 @@ ContactList.propTypes = {
         PropTypes.shape({
             id: PropTypes.string.isRequired,
             name: PropTypes.string.isRequired,
-            number: PropTypes.string.isRequired,
+            phone: PropTypes.string.isRequired,
         }).isRequired
     ),
     deleteContact: PropTypes.func.isRequired,
