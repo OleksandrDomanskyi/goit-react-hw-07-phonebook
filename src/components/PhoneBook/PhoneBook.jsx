@@ -22,7 +22,7 @@ const Phonebook = () => {
 
     useEffect(() => {
         dispatch(operations.fetchContacts());
-    }, []);
+    }, [dispatch]);
 
     const addContact = contacts => {
         dispatch(operations.addContact(contacts));
