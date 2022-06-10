@@ -1,7 +1,8 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 
-import { actions } from 'redux/contacts/contacts-slice';
-import { getContacts, getFilter } from 'redux/contacts/contacts-selector';
+import { getContacts, getError, getLoading } from 'redux/contacts/contacts-selector';
+import * as operations from 'redux/contacts/contacts-operations';
 
 import ContactForm from 'components/ContactForm';
 import ContactList from 'components/ContactList';
@@ -12,27 +13,28 @@ import styles from './phone-book.module.scss';
 const Phonebook = () => {
 
     const contacts = useSelector(getContacts, shallowEqual);
-    const filter = useSelector(getFilter, shallowEqual);
+    const loading = useSelector(getLoading, shallowEqual);
+    const error = useSelector(getError, shallowEqual);
+
+    const [filter, setFilter] = useState("");
 
     const dispatch = useDispatch();
 
-    const addContact = (data) => {
-        const action = actions.addContact(data);
-        const dublicate = contacts.find(contact => contact.name === data.name);
-        if (dublicate) {
-            alert(`${data.name} is already in contacts.`);
-            return;
-        };
-        dispatch(action);
+    useEffect(() => {
+        dispatch(operations.fetchContacts());
+    }, []);
+
+    const addContact = contacts => {
+        dispatch(operations.addContact(contacts));
     };
 
     const deleteContact = (id) => {
-        dispatch(actions.removeContact(id));
+        dispatch(operations.removeContact(id));
     };
 
-    const changeFilter = ({ target }) => {
-        dispatch(actions.getFilter(target.value)) 
-    };
+    const changeFilter = useCallback(({ target }) => {
+        setFilter(target.value)
+    }, [setFilter]);
 
     const getFilteredContacts = () => {
 
@@ -52,7 +54,9 @@ const Phonebook = () => {
             <ContactForm onSubmit={addContact} />
             <h2>Contacts</h2>
             <Filter changeFilter={changeFilter} filter={filter} />
-            <ContactList contacts={filteredContacts} deleteContact={deleteContact} />
+            {loading && <p>...Loading</p>}
+            {error && <p>{error.message}</p>}
+            {Boolean(filteredContacts.length) && <ContactList contacts={filteredContacts} deleteContact={deleteContact} />}
         </div>
     );
 };
